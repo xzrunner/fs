@@ -9,6 +9,8 @@ extern "C"
 #include <stdbool.h>
 
 void fs_set_apk_path(const char* apk_path);
+void fs_set_mem_path(const char* mem_path);
+const char* fs_get_mem_path();
 
 bool fs_is_file_exist(const char* file);
 

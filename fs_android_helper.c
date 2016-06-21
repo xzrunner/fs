@@ -6,24 +6,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char APKPATH[255];
+static char APK_PATH[255];
+static char MEM_PATH[255];
 
 void 
 fs_set_apk_path(const char* apk_path) {
-	strcpy(APKPATH, apk_path);
+	strcpy(APK_PATH, apk_path);
+}
+
+void 
+fs_set_mem_path(const char* mem_path) {
+	strcpy(MEM_PATH, mem_path);
+}
+
+const char* 
+fs_get_mem_path() {
+	return MEM_PATH;
 }
 
 bool 
 fs_is_file_exist(const char* file) {
-	if (!APKPATH || !file) return false;
+	if (!APK_PATH || !file) return false;
 
 	if (file[0] != '/')
 	{
 		// read from apk
 		char filepath[255] = "assets/";
 
-		if (!APKPATH) return false;
-		unzFile pFile = unzOpen(APKPATH);
+		if (!APK_PATH) return false;
+		unzFile pFile = unzOpen(APK_PATH);
 		if (!pFile) return false;
 		int nRet = unzLocateFile(pFile, strcat(filepath, file), 1);
 		if (UNZ_OK != nRet) return false;
@@ -106,7 +117,7 @@ fs_get_file_data(const char* filename, const char* mode, unsigned long* size) {
 	{
 		// read from apk
 		char filepath[255] = "assets/";
-		data =  fs_get_file_data_from_zip(APKPATH, strcat(filepath, filename), size);
+		data =  fs_get_file_data_from_zip(APK_PATH, strcat(filepath, filename), size);
 	}
 	else
 	{
