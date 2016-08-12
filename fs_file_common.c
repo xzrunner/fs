@@ -41,7 +41,7 @@ fs_size(struct fs_file* f) {
 
 int 
 fs_read(struct fs_file* f, void* buffer, size_t size) {
-	return fread(buffer, size, 1, f->fp);
+	return fread(buffer, 1, size, f->fp);
 }
 
 int 
