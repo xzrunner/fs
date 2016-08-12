@@ -59,4 +59,8 @@ fs_seek_from_head(struct fs_file* f, int offset) {
 	fseek(f->fp, offset, SEEK_SET);
 }
 
+fs_feof(struct fs_file* f) {
+    return feof(f->fp);
+}
+
 #endif // __ANDROID__

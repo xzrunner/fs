@@ -49,19 +49,16 @@ int
 fs_read(struct fs_file* f, void* buffer, size_t size) {
 	assert(f->size >= f->offset && f->size > 0 && f->buffer != NULL);
 	size_t sz;
-	int ret;
 	if(f->offset + size <= f->size) {
 		sz = size;
-		ret = 1;
 	} else {
 		sz = f->size - f->offset;
-		ret = 0;
 	}
 	if (sz > 0) {
 		memcpy(buffer, f->buffer + f->offset, sz);
 		f->offset += sz;
 	} 
-	return ret;
+	return sz;
 }
 
 int 
@@ -77,6 +74,11 @@ fs_seek_from_cur(struct fs_file* f, int offset) {
 void 
 fs_seek_from_head(struct fs_file* f, int offset) {
 	f->offset = offset;
+}
+
+int
+fs_feof(struct fs_file* f) {
+    return (f->offset >= f->size) ? 1 : 0;
 }
 
 #endif // __ANDROID__

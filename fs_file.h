@@ -21,6 +21,8 @@ int fs_write(struct fs_file* f, void* buffer, size_t size);
 void fs_seek_from_cur(struct fs_file* f, int offset);
 void fs_seek_from_head(struct fs_file* f, int offset);
 
+int fs_feof(struct fs_file* f);
+
 #endif // file_system_file_h
 
 #ifdef __cplusplus
