@@ -1,13 +1,60 @@
 #include "fs_android_helper.h"
 
-#include <unzip.h>
+#include <logger.h>
 
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+static AAssetManager* ASSET_MGR = NULL;
 
 static char APK_PATH[255];
 static char MEM_PATH[255];
+
+void 
+fs_set_asset_mgr(AAssetManager* mgr) {
+	ASSET_MGR = mgr;
+}
+
+AAssetManager* 
+fs_get_asset_mgr() {
+	return ASSET_MGR;
+}
+
+unsigned char* 
+fs_get_file_data(const char* path, const char* mode, unsigned long* size) {
+	AAssetManager* mgr = fs_get_asset_mgr();
+	if (!mgr) {
+		LOGD("android asset manager is NULL!\n");
+		return NULL;
+	}
+
+	AAsset* file = AAssetManager_open(mgr, path, AASSET_MODE_BUFFER);
+	if (!file) {
+		LOGD("load file fail: %s\n", path);
+		return NULL;
+	}
+
+	int len = AAsset_getLength(file);
+
+	unsigned char* buffer = (char*)malloc(len);
+	AAsset_read(file, buffer, len); 
+	AAsset_close(file);
+
+	if (size) {
+		*size = len;
+	}
+
+	return buffer;
+}
+
+bool fs_is_file_exist(const char* path) {
+	if (!ASSET_MGR) {
+		LOGD("android asset manager is NULL!\n");
+		return false;
+	}
+
+	AAsset* file = AAssetManager_open(ASSET_MGR, path, AASSET_MODE_BUFFER);
+	return file == NULL ? false : true;
+}
 
 void 
 fs_set_apk_path(const char* apk_path) {
@@ -22,128 +69,4 @@ fs_set_mem_path(const char* mem_path) {
 const char* 
 fs_get_mem_path() {
 	return MEM_PATH;
-}
-
-bool 
-fs_is_file_exist(const char* file) {
-	if (!APK_PATH || !file) return false;
-
-	if (file[0] != '/')
-	{
-		// read from apk
-		char filepath[255] = "assets/";
-
-		if (!APK_PATH) return false;
-		unzFile pFile = unzOpen(APK_PATH);
-		if (!pFile) return false;
-		int nRet = unzLocateFile(pFile, strcat(filepath, file), 1);
-		if (UNZ_OK != nRet) return false;
-		unzClose(pFile);
-		return true;
-	}
-	else
-	{
-		// read from other path than user set it
-		FILE *fp = fopen(file, "rb");
-		if (fp) {
-			fclose(fp);
-			return true;
-		} else {
-			return false; 
-		}
-	}
-
-	return false;
-}
-
-static unsigned char* 
-fs_get_file_data_from_zip(const char* zipfilepath, const char* filename, unsigned long* size)
-{
-	unsigned char * buffer = NULL;
-	unzFile file = NULL;
-	*size = 0;
-
-	do 
-	{
-		if (!zipfilepath || !filename) break;
-
-		if (strlen(zipfilepath) == 0) break;
-
-		file = unzOpen(zipfilepath);
-		if (!file) break;
-
-		int nRet = unzLocateFile(file, filename, 1);
-		if (UNZ_OK != nRet) break;
-
-		char szFilePathA[260];
-		unz_file_info FileInfo;
-		nRet = unzGetCurrentFileInfo(file, &FileInfo, szFilePathA, sizeof(szFilePathA), NULL, 0, NULL, 0);
-		if (UNZ_OK != nRet) break;
-
-		nRet = unzOpenCurrentFile(file);
-		if (UNZ_OK != nRet) break;
-
-		buffer = (unsigned char*)malloc(FileInfo.uncompressed_size);
-		if(!buffer) {
-			return NULL;
-		}
-		int nSize = 0;
-		nSize = unzReadCurrentFile(file, buffer, FileInfo.uncompressed_size);
-
-		*size = FileInfo.uncompressed_size;
-
-		unzCloseCurrentFile(file);
-
-	} while (0);
-
-	if (file)
-	{
-		unzClose(file);
-	}
-
-	return buffer;
-}
-
-unsigned char* 
-fs_get_file_data(const char* filename, const char* mode, unsigned long* size) {
-	unsigned char* data = 0;
-
-	if ((! filename) || (! mode))
-	{
-		return NULL;
-	}
-
-	if (filename[0] != '/')
-	{
-		// read from apk
-		char filepath[255] = "assets/";
-		data =  fs_get_file_data_from_zip(APK_PATH, strcat(filepath, filename), size);
-	}
-	else
-	{
-		do 
-		{
-			// read from other path than user set it
-			FILE *fp = fopen(filename, mode);
-			if (!fp) break;
-
-			unsigned long sz;
-			fseek(fp,0,SEEK_END);
-			sz = ftell(fp);
-			fseek(fp,0,SEEK_SET);
-			data = (unsigned char*) malloc(sz);
-			if(!data) {
-				return NULL;
-			}
-			sz = fread(data,sizeof(unsigned char), sz,fp);
-			fclose(fp);
-
-			if (size)
-			{
-				*size = sz;
-			}            
-		} while (0);        
-	}
-
-	return data;
 }
