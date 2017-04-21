@@ -21,39 +21,77 @@ fs_get_asset_mgr() {
 
 unsigned char* 
 fs_get_file_data(const char* path, const char* mode, unsigned long* size) {
-	AAssetManager* mgr = fs_get_asset_mgr();
-	if (!mgr) {
-		LOGD("android asset manager is NULL!\n");
+	if (!path) {
 		return NULL;
 	}
+	if (path[0] != '/') {
+		if (!ASSET_MGR) {
+			LOGD("android asset manager is NULL!\n");
+			return NULL;
+		}
 
-	AAsset* file = AAssetManager_open(mgr, path, AASSET_MODE_BUFFER);
-	if (!file) {
-		LOGD("load file fail: %s\n", path);
-		return NULL;
+		AAsset* asset = AAssetManager_open(ASSET_MGR, path, AASSET_MODE_BUFFER);
+		if (!asset) {
+			LOGD("open asset fail: %s\n", path);
+			return NULL;
+		}
+
+		int len = AAsset_getLength(asset);
+
+		unsigned char* buffer = (char*)malloc(len);
+		AAsset_read(asset, buffer, len); 
+		AAsset_close(asset);
+
+		if (size) {
+			*size = len;
+		}
+
+		return buffer;
+	} else {
+		FILE* fp = fopen(path, "rb");
+		if(!fp) {
+		    LOGD("open file fail: %s\n", path);
+		    return NULL;
+		}
+		fseek(fp, 0, SEEK_END);
+		long length = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+		char* buffer = malloc(length);
+	    if(!buffer) {
+		    fclose(fp);
+			LOGD("read file no memory: %s\n", path);
+		    return NULL;
+		}
+		fread(buffer, 1, length, fp);
+		fclose(fp);
+		return buffer;
 	}
-
-	int len = AAsset_getLength(file);
-
-	unsigned char* buffer = (char*)malloc(len);
-	AAsset_read(file, buffer, len); 
-	AAsset_close(file);
-
-	if (size) {
-		*size = len;
-	}
-
-	return buffer;
 }
 
-bool fs_is_file_exist(const char* path) {
-	if (!ASSET_MGR) {
-		LOGD("android asset manager is NULL!\n");
+bool 
+fs_is_file_exist(const char* path) {
+	if (!path) {
 		return false;
+	}	
+	if (path[0] != '/') {
+		if (!ASSET_MGR) {
+			LOGD("android asset manager is NULL!\n");
+			return false;
+		}
+		AAsset* asset = AAssetManager_open(ASSET_MGR, path, AASSET_MODE_BUFFER);
+		if (asset) {
+			AAsset_close(asset);
+			return true;
+		}
+		return false;
+	} else {
+	    FILE* file;
+	    if (file = fopen(path, "rb")) {
+	        fclose(file);
+	        return true;
+	    }
+	    return false;
 	}
-
-	AAsset* file = AAssetManager_open(ASSET_MGR, path, AASSET_MODE_BUFFER);
-	return file == NULL ? false : true;
 }
 
 void 
