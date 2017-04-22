@@ -17,6 +17,7 @@ size_t fs_size(struct fs_file* f);
 
 int fs_read(struct fs_file* f, void* buffer, size_t size);
 int fs_write(struct fs_file* f, void* buffer, size_t size);
+long fs_ftell(struct fs_file* f);
 
 void fs_seek_from_cur(struct fs_file* f, int offset);
 void fs_seek_from_head(struct fs_file* f, int offset);

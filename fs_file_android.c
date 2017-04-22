@@ -110,6 +110,15 @@ fs_write(struct fs_file* f, void* buffer, size_t size) {
 	}
 }
 
+long
+fs_ftell(struct fs_file* f) {
+	if(!f->in_apk) {
+		return ftell(f->fp);
+	}else {
+		return (long)f->offset;
+	}
+}
+
 void 
 fs_seek_from_cur(struct fs_file* f, int offset) {
 	if (f->in_apk) {
