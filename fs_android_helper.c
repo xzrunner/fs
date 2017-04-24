@@ -64,8 +64,13 @@ fs_get_file_data(const char* path, const char* mode, unsigned long* size) {
 			LOGD("read file no memory: %s\n", path);
 		    return NULL;
 		}
-		fread(buffer, 1, length, fp);
+		length = fread(buffer, 1, length, fp);
 		fclose(fp);
+
+		if(size) {
+			*size = length;
+		}
+
 		return buffer;
 	}
 }
