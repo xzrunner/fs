@@ -7,6 +7,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := fs
 
 LOCAL_C_INCLUDES  := \
+	${LUA_SRC_PATH} \
 	${ZIP_SRC_PATH} \
 	${LOGGER_SRC_PATH} \
 
