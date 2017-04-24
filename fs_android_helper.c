@@ -1,3 +1,5 @@
+#ifdef __ANDROID__
+
 #include "fs_android_helper.h"
 
 #include <logger.h>
@@ -108,3 +110,5 @@ const char*
 fs_get_mem_path() {
 	return MEM_PATH;
 }
+
+#endif // __ANDROID__

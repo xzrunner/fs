@@ -13,6 +13,7 @@ LOCAL_C_INCLUDES  := \
 LOCAL_SRC_FILES := \
 	$/fs_android_helper.c \
 	$/fs_file_android.c \
+	$/lfs_file.c \
 
 include $(BUILD_STATIC_LIBRARY)
 
