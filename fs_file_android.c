@@ -139,6 +139,16 @@ fs_seek_from_head(struct fs_file* f, int offset) {
 	}
 }
 
+void 
+fs_seek_from_end(struct fs_file* f, int offset) {
+	if (f->in_apk) {
+		AAsset_seek(f->asset, offset, SEEK_END);
+		f->offset = fs_size(f) + offset;
+	} else {
+		fseek(f->fp, offset, SEEK_END);
+	}
+}
+
 int
 fs_feof(struct fs_file* f) {
 	if (f->in_apk) {

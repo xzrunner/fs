@@ -21,6 +21,7 @@ long fs_ftell(struct fs_file* f);
 
 void fs_seek_from_cur(struct fs_file* f, int offset);
 void fs_seek_from_head(struct fs_file* f, int offset);
+void fs_seek_from_end(struct fs_file* f, int offset);
 
 int fs_feof(struct fs_file* f);
 

@@ -65,6 +65,11 @@ fs_seek_from_head(struct fs_file* f, int offset) {
 	fseek(f->fp, offset, SEEK_SET);
 }
 
+void
+fs_seek_from_end(struct fs_file* f, int offset) {
+	fseek(f->fp, offset, SEEK_END);
+}
+
 int
 fs_feof(struct fs_file* f) {
     return feof(f->fp);
