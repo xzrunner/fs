@@ -30,7 +30,7 @@ static int
 lfsfile_read(lua_State* L) {
     struct lfs_handle* p = _self(L);
     check_op(p, "read invalid lfsfile_handle");
-    int sz = luaL_optinteger(L, 2, 1);
+    int sz = (int)luaL_optinteger(L, 2, 1);
     if(sz <= 0) {
         luaL_error(L, "invalid read sz:%d", sz);
     }
@@ -75,7 +75,7 @@ lfsfile_seek(lua_State* L) {
     struct lfs_handle* p = _self(L);
     check_op(p, "seek invalid lfsfile_handle");
     const char* fmt = luaL_optstring(L, 2, "cur");
-    int offset = luaL_optinteger(L, 3, 0);
+    int offset = (int)luaL_optinteger(L, 3, 0);
 
     if(strcmp(fmt, "cur")==0) {
         fs_seek_from_cur(p->f, offset);
