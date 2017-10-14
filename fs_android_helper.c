@@ -21,6 +21,49 @@ fs_get_asset_mgr() {
 	return ASSET_MGR;
 }
 
+bool
+fs_get_file_size(const char* path, unsigned long* size) {
+	if (!path) {
+		return false;
+	}
+	if (path[0] != '/') {
+		if (!ASSET_MGR) {
+			LOGD("android asset manager is NULL!\n");
+			return false;
+		}
+
+		AAsset* asset = AAssetManager_open(ASSET_MGR, path, AASSET_MODE_BUFFER);
+		if (!asset) {
+			LOGD("open asset fail: %s\n", path);
+			return false;
+		}
+
+		int len = AAsset_getLength(asset);
+		AAsset_close(asset);
+
+		if (size) {
+			*size = len;
+		}
+
+		return true;
+	} else {
+		FILE* fp = fopen(path, "rb");
+		if(!fp) {
+		    LOGD("open file fail: %s\n", path);
+		    return false;
+		}
+		fseek(fp, 0, SEEK_END);
+		long length = ftell(fp);
+		fclose(fp);
+
+		if(size) {
+			*size = length;
+		}
+
+		return true;
+	}
+}
+
 unsigned char* 
 fs_get_file_data(const char* path, const char* mode, unsigned long* size) {
 	if (!path) {

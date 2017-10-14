@@ -13,6 +13,8 @@ extern "C"
 void fs_set_asset_mgr(AAssetManager* mgr);
 AAssetManager* fs_get_asset_mgr();
 
+bool fs_get_file_size(const char *path, unsigned long* size);
+
 unsigned char* fs_get_file_data(const char* path, 
 								const char* mode, 
 								unsigned long* size);
