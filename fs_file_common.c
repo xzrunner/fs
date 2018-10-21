@@ -8,7 +8,7 @@ struct fs_file {
 	FILE* fp;
 };
 
-struct fs_file* 
+struct fs_file*
 fs_open(const char* path, const char* format) {
 	FILE* fp = fopen(path, format);
 	if (fp) {
@@ -20,7 +20,7 @@ fs_open(const char* path, const char* format) {
 	}
 }
 
-void 
+void
 fs_close(struct fs_file* f) {
 	if (f == NULL) return;
 
@@ -30,7 +30,7 @@ fs_close(struct fs_file* f) {
 	free(f);
 }
 
-size_t 
+size_t
 fs_size(struct fs_file* f) {
 	size_t save_pos = ftell(f->fp);
 	fseek(f->fp, 0, SEEK_END);
@@ -39,12 +39,12 @@ fs_size(struct fs_file* f) {
 	return sz;
 }
 
-int 
+int
 fs_read(struct fs_file* f, void* buffer, size_t size) {
 	return fread(buffer, 1, size, f->fp);
 }
 
-int 
+int
 fs_write(struct fs_file* f, void* buffer, size_t size) {
 	return fwrite(buffer, size, 1, f->fp);
 }
@@ -54,7 +54,7 @@ fs_ftell(struct fs_file* f) {
 	return ftell(f->fp);
 }
 
-void 
+void
 fs_seek_from_cur(struct fs_file* f, int offset) {
 	fseek(f->fp, offset, SEEK_CUR);
 }
